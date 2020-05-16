@@ -57,7 +57,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
   }, [getListOfTasks]);
 
   useEffect(() => {
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   }, [props.tasksList]);
 
 
@@ -75,7 +75,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
     }
 
     dispatch({ type: 'selectedSort', payload: sortDetails });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, sortDetails, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), state.selectedGroupBy, sortDetails, state.selectedStatus) });
   };
 
   const setArrow = (column) => {
@@ -93,7 +93,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
 
   const onGroupSelect = (event) => {
     dispatch({ type: 'selectedGroupBy', payload: event.target.value });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, event.target.value, state.selectedSort, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), event.target.value, state.selectedSort, state.selectedStatus) });
   };
 
   const handleClick = (event, item, clickType) => {
@@ -130,13 +130,17 @@ const TaskList = ({ getListOfTasks, ...props }) => {
 
   const onSearchChange = (event) => {
     dispatch({ type: 'searchVal', payload: event.target.value });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, event.target.value, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, event.target.value, getSearchPropsInGrid(), state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   };
 
   const onSetStatusChange = (selectedStatus) => {
     dispatch({ type: 'selectedStatus', payload: selectedStatus });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), state.selectedGroupBy, state.selectedSort, selectedStatus) });
   };
+
+  const getSearchPropsInGrid = () => {
+    return props.configData.GridColumns.map(item => item.filterable ? item.field : "");
+  }
 
   return (
     <>
@@ -167,19 +171,19 @@ const TaskList = ({ getListOfTasks, ...props }) => {
       </div>
 
       <div className="content-box">
-        <ListGrid
+        {/* <ListGrid
           tasksList={state.data}
           onSort={onSort}
           setArrow={setArrow}
           groupBy={state.selectedGroupBy}
           handleClick={handleClick}
-        />
+        /> */}
         <GridList
-          tasksList={data}
+          tasksList={state.data}
           gridColumns={props.configData.GridColumns}
           onSort={onSort}
           setArrow={setArrow}
-          groupBy={groupBy}
+          groupBy={state.selectedGroupBy}
           handleClick={handleClick} />
       </div>
       <ModalPopup showModal={state.showEdit} onClose={() => viewEditTask(false)}>
