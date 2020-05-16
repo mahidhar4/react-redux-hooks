@@ -1,5 +1,5 @@
 import React from "react";
-import { enumState } from "../../utils/constants";
+import { enumState, hasValue } from "../../utils/constants";
 import { Button } from "react-bootstrap";
 
 const enumClick = {
@@ -8,6 +8,27 @@ const enumClick = {
     Done: "Done",
     ReOpen: "ReOpen",
     View: "View"
+};
+
+const filterAndAttachRow = (header, innerItem, search) => {
+    let strData = (header.type === "date" ?
+        new Date(innerItem[header.field]).toLocaleDateString() :
+        innerItem[header.field]);
+
+    if (header.filterable && hasValue(search) && hasValue(strData)) {
+        const start = strData.toLowerCase().indexOf(search.toLowerCase());
+        const middle = search.length;
+        const end = start + middle;
+        if (start > -1) {
+            strData = <>
+                <span>{strData.substr(0, start)}</span>
+                <span className="higlight">{strData.substr(start, end)}</span>
+                <span>{strData.substr(end)}</span>
+            </>;
+        }
+    }
+
+    return strData;
 };
 
 // usage
@@ -56,13 +77,12 @@ export const GridList = (props) => {
                                         {props.gridColumns.map((header, headerIndex) => {
                                             return !header.template ?
                                                 (!header.hidden ? <td key={`grid-data-${headerIndex}-${innerIndex}`}>
-                                                    {header.type === "date" ?
-                                                        new Date(innerItem[header.field]).toLocaleDateString() : innerItem[header.field]}
+                                                    {filterAndAttachRow(header, innerItem, props.filterVal)}
                                                 </td> : <></>) : (
                                                     <td>
                                                         {innerItem.state === enumState.Open ? (
                                                             <>
-                                                            <Button size="sm" variant="secondary" onClick={(event) => props.handleClick(event, innerItem, enumClick.Edit)}>
+                                                                <Button size="sm" variant="secondary" onClick={(event) => props.handleClick(event, innerItem, enumClick.Edit)}>
                                                                     Edit
                                                              </Button>{" "}
                                                                 <Button size="sm" variant="danger" onClick={(event) => props.handleClick(event, innerItem, enumClick.Delete)}>

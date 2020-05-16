@@ -178,6 +178,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
         /> */}
         <GridList
           tasksList={state.data}
+          filterVal={state.searchVal}
           gridColumns={props.configData.GridColumns}
           onSort={onSort}
           setArrow={setArrow}
