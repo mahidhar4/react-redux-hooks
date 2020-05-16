@@ -1,9 +1,23 @@
-  // Modal itself
-  .custom-modal {
-      background-color: #fff;
-      box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.2);
-      width: 75%;
-      padding: 15px;
-      border-radius: 0.3rem;
-      border: 1px solid #ccc;
-  }
+// Modal itself
+.custom-modal {
+    background-color: #fff;
+    box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.2);
+    width: 60%;
+    padding: 15px;
+    border-radius: 0.3rem;
+    border: 2px solid #ec7f37;
+    .form-header {
+        overflow: hidden;
+        background-color: #ec7f37;
+        padding: 20px 10px;
+        font-size: 20px;
+        color: white;
+        font-weight: bolder;
+    }
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    form {
+        margin: 25px;
+    }
+}

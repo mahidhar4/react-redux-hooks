@@ -50,7 +50,7 @@ export const GridList = (props) => {
                                         </tr>
                                     )}
 
-                                    <tr className={innerItem.state === enumState.Done ? "strikeout" : ""}
+                                    <tr className={innerItem.state === enumState.Done ? "done" : ""}
                                         onClick={(event) => props.handleClick(event, innerItem, enumClick.View)}>
 
                                         {props.gridColumns.map((header, headerIndex) => {
