@@ -103,10 +103,11 @@ const Task = (props) => {
                         <Form.Group as={Col} md="3" controlId="Task.Priority">
                             <Form.Label>Priority</Form.Label>
                             <Form.Control as="select" onChange={handleChange} name="priority" value={state.priority}>
-                                <option>{enumPriority.None}</option>
-                                <option>{enumPriority.Low}</option>
-                                <option>{enumPriority.Medium}</option>
-                                <option>{enumPriority.High}</option>
+                                {
+                                    Object.keys(enumPriority).map(itemKey => {
+                                        return <option value={enumPriority[itemKey]}>{enumPriority[itemKey]}</option>
+                                    })
+                                }
                             </Form.Control>
                         </Form.Group>
                         <Form.Group as={Col} md="3" controlId="Task.DueDate">
@@ -121,7 +122,7 @@ const Task = (props) => {
                                 <>
                                     <Form.Group as={Col} md="3" controlId="Task.CreatedAt">
                                         <Form.Label>Created On</Form.Label>
-                                        <Form.Control type="text" value={state.createdAt} />
+                                        <Form.Control type="text" value={new Date(state.createdAt).toLocaleDateString()} />
                                     </Form.Group>
                                     <Form.Group as={Col} md="3" controlId="Task.State">
                                         <Form.Label>Current State</Form.Label>
