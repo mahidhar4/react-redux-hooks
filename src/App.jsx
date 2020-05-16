@@ -9,8 +9,8 @@ function App() {
       <div>
         <Switch>
           <Route path="/">
-            <div class="header">
-              <a href="/" class="logo">
+            <div className="header">
+              <a href="/" className="logo">
                 <h3>To Do</h3>
               </a>
             </div>
