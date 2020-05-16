@@ -24,7 +24,7 @@
             "title": "Priority",
             "width": 200,
             "sortable": true,
-            "filterable": true,
+            "filterable": false,
             "groupable": true,
             "hidden": false
         },
@@ -33,7 +33,7 @@
             "title": "Created On",
             "width": 200,
             "sortable": true,
-            "filterable": true,
+            "filterable": false,
             "groupable": true,
             "hidden": false,
             "type": "date"
@@ -43,7 +43,7 @@
             "title": "Due date",
             "width": 200,
             "sortable": true,
-            "filterable": true,
+            "filterable": false,
             "groupable": true,
             "hidden": false,
             "type": "date"
@@ -53,7 +53,7 @@
             "title": "Actions",
             "width": 200,
             "sortable": true,
-            "filterable": true,
+            "filterable": false,
             "groupable": false,
             "hidden": false,
             "template": true

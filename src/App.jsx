@@ -31,11 +31,11 @@ function App(props) {
           </Route>
         </Switch>
         {
-          showSpinner && (
+          showSpinner ? (
             <div className='custom-modal-overlay'>
               <Spinner animation="grow" variant="primary" />
             </div>
-          )
+          ) : <></>
         }
       </div>
     </Router>

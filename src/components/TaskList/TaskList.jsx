@@ -138,7 +138,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
   };
 
   const getSearchPropsInGrid = () => {
-    return props.configData.GridColumns.map(item => item.filterable ? item.field : "");
+    return props.configData.GridColumns.map(item => { return item.filterable ? item.field : null }).filter(item => item !== null);
   }
 
   return (
