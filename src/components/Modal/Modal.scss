@@ -1,0 +1,44 @@
+  // Modal wrapper
+  .custom-modal-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      opacity: 1;
+      animation: custom-show .5s ease;
+      overflow-x: hidden;
+      overflow-y: auto;
+  }
+  
+  // Fade in open animation
+  @keyframes custom-show {
+      0% {
+          display: none;
+          opacity: 0;
+      }
+      1% {
+          display: flex;
+          opacity: 0;
+      }
+      100% {
+          opacity: 1;
+      }
+  }
+  
+  ;
+  // Modal itself
+  .custom-modal {
+      background-color: #fff;
+      box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.2);
+      width: 75%;
+      padding: 15px;
+      border-radius: 0.3rem;
+      border: 1px solid #ccc;
+  }

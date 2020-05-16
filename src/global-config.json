@@ -1,0 +1,5 @@
+{
+    "AllowGlobalSearchProps": ["taskSummary", "taskDescription"],
+    "AllowGroupByProps": ["createdAt", "dueDate", "priority"],
+    "AllowSortProps": ["taskSummary", "priority", "dueDate", "createdAt", "state"]
+}
