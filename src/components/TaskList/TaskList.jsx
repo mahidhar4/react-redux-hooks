@@ -7,13 +7,14 @@ import { Button } from "react-bootstrap";
 import ModalPopup from '../Modal/ModalPopup';
 import Task from '../Tasks/Task';
 import Form from 'react-bootstrap/Form'
+import { GridList } from "../Grid/Grid"
 
 const enumClick = {
   Edit: "Edit",
   Delete: "Delete",
   Done: "Done",
   ReOpen: "ReOpen",
-  View: "View"
+  View: "View",
 };
 
 function reducer(state, action) {
@@ -56,13 +57,12 @@ const TaskList = ({ getListOfTasks, ...props }) => {
   }, [getListOfTasks]);
 
   useEffect(() => {
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   }, [props.tasksList]);
-
 
   const onSort = (column) => {
 
-    if (props.configData.AllowSortProps.indexOf(column) <= -1) return;
+    if (props.configData.GridColumns.filter(item => item.field === column && item.sortable).length === 0) return;
 
     let sortDetails = {
       column,
@@ -74,12 +74,12 @@ const TaskList = ({ getListOfTasks, ...props }) => {
     }
 
     dispatch({ type: 'selectedSort', payload: sortDetails });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, sortDetails, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), state.selectedGroupBy, sortDetails, state.selectedStatus) });
   };
 
   const setArrow = (column) => {
 
-    if (props.configData.AllowSortProps.indexOf(column) <= -1) return;
+    if (props.configData.GridColumns.filter(item => item.field === column && item.sortable).length === 0) return;
 
     let className = "sort-direction";
 
@@ -92,7 +92,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
 
   const onGroupSelect = (event) => {
     dispatch({ type: 'selectedGroupBy', payload: event.target.value });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, event.target.value, state.selectedSort, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), event.target.value, state.selectedSort, state.selectedStatus) });
   };
 
   const handleClick = (event, item, clickType) => {
@@ -113,13 +113,13 @@ const TaskList = ({ getListOfTasks, ...props }) => {
       case enumClick.Done:
         props.updateTask({
           ...item,
-          state: enumState.Done
+          state: enumState.Done,
         });
         break;
       case enumClick.ReOpen:
         props.updateTask({
           ...item,
-          state: enumState.Open
+          state: enumState.Open,
         });
         break;
       default:
@@ -129,13 +129,17 @@ const TaskList = ({ getListOfTasks, ...props }) => {
 
   const onSearchChange = (event) => {
     dispatch({ type: 'searchVal', payload: event.target.value });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, event.target.value, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, event.target.value, getSearchPropsInGrid(), state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   };
 
   const onSetStatusChange = (selectedStatus) => {
     dispatch({ type: 'selectedStatus', payload: selectedStatus });
-    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, selectedStatus) });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, getSearchPropsInGrid(), state.selectedGroupBy, state.selectedSort, selectedStatus) });
   };
+
+  const getSearchPropsInGrid = () => {
+    return props.configData.GridColumns.map(item => item.filterable ? item.field : "");
+  }
 
   return (
     <>
@@ -151,14 +155,13 @@ const TaskList = ({ getListOfTasks, ...props }) => {
           <Form.Control as="select" className="groupby-dropdown" onChange={(e) => onGroupSelect(e)}>
             <option value="">None</option>
             {
-              props.configData.AllowGroupByProps.map(groupProp => (
-                <option value={groupProp}>{groupProp}</option>
+              props.configData.GridColumns.map((groupProp, index) => (
+                groupProp.groupable ? <option value={groupProp.field} key={index}>{groupProp.title}</option> : <></>
               ))
             }
           </Form.Control>
         </Form.Group>
       </div>
-
       <div className="tabs">
         <Button variant={state.selectedStatus === "" ? "primary" : "light"} onClick={() => onSetStatusChange("")}>All</Button>{' '}
         <Button variant={state.selectedStatus === enumState.Open ? "primary" : "light"} onClick={() => onSetStatusChange(enumState.Open)}>Pending</Button>{' '}
@@ -166,13 +169,20 @@ const TaskList = ({ getListOfTasks, ...props }) => {
       </div>
 
       <div className="content-box">
-        <ListGrid
+        {/* <ListGrid
           tasksList={state.data}
           onSort={onSort}
           setArrow={setArrow}
           groupBy={state.selectedGroupBy}
           handleClick={handleClick}
-        />
+        /> */}
+        <GridList
+          tasksList={state.data}
+          gridColumns={props.configData.GridColumns}
+          onSort={onSort}
+          setArrow={setArrow}
+          groupBy={state.selectedGroupBy}
+          handleClick={handleClick} />
       </div>
       <ModalPopup showModal={state.showEdit} onClose={() => viewEditTask(false)}>
         <Task mode={EntryWindowMode.Edit} taskItem={state.selectedItem} onClose={viewEditTask} />
@@ -221,7 +231,7 @@ const ListGrid = (props) => {
                     <tr className="grouping-headers">
                       <td>
                         {props.groupBy === "createdAt" ||
-                          props.groupBy === "dueDate"
+                        props.groupBy === "dueDate"
                           ? new Date(item).toLocaleDateString()
                           : item}
                       </td>
@@ -232,7 +242,18 @@ const ListGrid = (props) => {
                     </tr>
                   )}
 
-                  <tr className={innerItem.state === enumState.Done ? "strikeout" : ""} onClick={(event) => props.handleClick(event, innerItem, enumClick.View)}>
+                  <tr
+                    className={
+                      innerItem.state === enumState.Done
+                        ? "done"
+                        : innerItem.state === enumState.Open
+                        ? "pending"
+                        : ""
+                    }
+                    onClick={(event) =>
+                      props.handleClick(event, innerItem, enumClick.View)
+                    }
+                  >
                     <td>{innerItem.taskSummary}</td>
                     <td>{innerItem.priority}</td>
                     <td>
@@ -242,21 +263,61 @@ const ListGrid = (props) => {
                     <td>
                       {innerItem.state === enumState.Open ? (
                         <>
-                          <Button size="sm" variant="secondary" onClick={(event) => props.handleClick(event, innerItem, enumClick.Edit)}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={(event) =>
+                              props.handleClick(
+                                event,
+                                innerItem,
+                                enumClick.Edit
+                              )
+                            }
+                          >
                             Edit
                           </Button>{" "}
-                          <Button size="sm" variant="danger" onClick={(event) => props.handleClick(event, innerItem, enumClick.Delete)}>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={(event) =>
+                              props.handleClick(
+                                event,
+                                innerItem,
+                                enumClick.Delete
+                              )
+                            }
+                          >
                             Delete
                           </Button>{" "}
-                          <Button size="sm" variant="primary" onClick={(event) => props.handleClick(event, innerItem, enumClick.Done)}>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={(event) =>
+                              props.handleClick(
+                                event,
+                                innerItem,
+                                enumClick.Done
+                              )
+                            }
+                          >
                             Done
                           </Button>
                         </>
                       ) : (
-                          <Button size="sm" variant="primary" onClick={(event) => props.handleClick(event, innerItem, enumClick.ReOpen)}>
-                            Re open
-                          </Button>
-                        )}
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={(event) =>
+                            props.handleClick(
+                              event,
+                              innerItem,
+                              enumClick.ReOpen
+                            )
+                          }
+                        >
+                          Re open
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 </>
@@ -275,7 +336,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) => ({
   tasksList: state.tasks.tasksList,
-  configData: state.config.configData
+  configData: state.config.configData,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TaskList);

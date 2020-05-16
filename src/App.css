@@ -2,6 +2,24 @@
     text-align: center;
 }
 
+.header {
+  overflow: hidden;
+  background-color: #ec7f37;
+  padding: 20px 10px;
+}
+
+.header > a {
+  text-decoration: none;
+}
+
+.header > a > h3 {
+  color: white;
+  display: inline;
+  font-family: serif;
+  font-weight: bolder;
+  margin-left:30px;
+}
+
 .App-logo {
     height: 40vmin;
     pointer-events: none;

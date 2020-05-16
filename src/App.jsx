@@ -22,6 +22,11 @@ function App(props) {
       <div>
         <Switch>
           <Route path="/">
+            <div class="header">
+              <a href="/" class="logo">
+                <h3>To Do</h3>
+              </a>
+            </div>
             <Home />
           </Route>
         </Switch>
