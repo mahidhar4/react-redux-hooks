@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { enumState, applySearchSortGroupOnData, EntryWindowMode, sortData } from "../../utils/constants";
+import { enumState, applySearchSortGroupOnData, EntryWindowMode } from "../../utils/constants";
 import "./TaskList.scss";
 import { connect } from "react-redux";
 import { actions as taskActions } from "../../reducers/actions/tasks";
@@ -7,6 +7,7 @@ import { Button } from "react-bootstrap";
 import ModalPopup from '../Modal/ModalPopup';
 import Task from '../Tasks/Task';
 import Form from 'react-bootstrap/Form'
+import { GridList } from "../Grid/Grid"
 
 const enumClick = {
   Edit: "Edit",
@@ -36,13 +37,13 @@ const TaskList = (props) => {
   }, []);
 
   useEffect(() => {
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, groupBy, sort, status));
+    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.GridColumns.map(item => item.filterable ? item.field : ""), groupBy, sort, status));
   }, [props.tasksList]);
 
 
   const onSort = (column) => {
 
-    if (props.configData.AllowSortProps.indexOf(column) <= -1) return;
+    if (props.configData.GridColumns.filter(item => item.field === column && item.sortable).length === 0) return;
 
     let sortDetails = {
       column,
@@ -53,12 +54,12 @@ const TaskList = (props) => {
         : "desc"
     }
     setSort(sortDetails);
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, groupBy, sortDetails, status));
+    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.GridColumns.map(item => item.filterable ? item.field : ""), groupBy, sortDetails, status));
   };
 
   const setArrow = (column) => {
 
-    if (props.configData.AllowSortProps.indexOf(column) <= -1) return;
+    if (props.configData.GridColumns.filter(item => item.field === column && item.sortable).length === 0) return;
 
     let className = "sort-direction";
 
@@ -71,7 +72,7 @@ const TaskList = (props) => {
 
   const onGroupSelect = (event) => {
     setGroupBy(event.target.value);
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, event.target.value, sort, status));
+    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.GridColumns.map(item => item.filterable ? item.field : ""), event.target.value, sort, status));
   };
 
   const handleClick = (event, item, clickType) => {
@@ -108,12 +109,12 @@ const TaskList = (props) => {
 
   const onSearchChange = (event) => {
     setSearchVal(event.target.value);
-    setData(applySearchSortGroupOnData(props.tasksList, event.target.value, props.configData.AllowGlobalSearchProps, groupBy, sort, status));
+    setData(applySearchSortGroupOnData(props.tasksList, event.target.value, props.configData.GridColumns.map(item => item.filterable ? item.field : ""), groupBy, sort, status));
   };
 
   const onSetStatusChange = (selectedStatus) => {
     setStatus(selectedStatus);
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, groupBy, sort, selectedStatus));
+    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.GridColumns.map(item => item.filterable ? item.field : ""), groupBy, sort, selectedStatus));
   };
 
   return (
@@ -130,8 +131,8 @@ const TaskList = (props) => {
           <Form.Control as="select" className="groupby-dropdown" onChange={(e) => onGroupSelect(e)}>
             <option value="">None</option>
             {
-              props.configData.AllowGroupByProps.map(groupProp => (
-                <option value={groupProp}>{groupProp}</option>
+              props.configData.GridColumns.map((groupProp, index) => (
+                groupProp.groupable ? <option value={groupProp.field} key={index}>{groupProp.title}</option> : <></>
               ))
             }
           </Form.Control>
@@ -145,13 +146,20 @@ const TaskList = (props) => {
       </div>
 
       <div className="content-box">
-        <ListGrid
+        {/* <ListGrid
           tasksList={data}
           onSort={onSort}
           setArrow={setArrow}
           groupBy={groupBy}
           handleClick={handleClick}
-        />
+        /> */}
+        <GridList
+          tasksList={data}
+          gridColumns={props.configData.GridColumns}
+          onSort={onSort}
+          setArrow={setArrow}
+          groupBy={groupBy}
+          handleClick={handleClick} />
       </div>
       <ModalPopup showModal={showEdit} onClose={() => setShowEdit(false)}>
         <Task mode={EntryWindowMode.Edit} taskItem={selectedItem} onClose={setShowEdit} />
