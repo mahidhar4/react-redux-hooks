@@ -1,5 +1,62 @@
 {
-    "AllowGlobalSearchProps": ["taskSummary", "taskDescription"],
-    "AllowGroupByProps": ["createdAt", "dueDate", "priority"],
-    "AllowSortProps": ["taskSummary", "priority", "dueDate", "createdAt", "state"]
+   
+    "GridColumns": [
+        {
+            "field": "taskSummary",
+            "title": "Summary",
+            "width": 200,
+            "sortable": true,
+            "filterable": true,
+            "groupable": false,
+            "hidden": false
+        },
+        {
+            "field": "taskDescription",
+            "title": "Description",
+            "width": 200,
+            "sortable": true,
+            "filterable": true,
+            "groupable": false,
+            "hidden": true
+        },
+        {
+            "field": "priority",
+            "title": "Priority",
+            "width": 200,
+            "sortable": true,
+            "filterable": true,
+            "groupable": true,
+            "hidden": false
+        },
+        {
+            "field": "createdAt",
+            "title": "Created On",
+            "width": 200,
+            "sortable": true,
+            "filterable": true,
+            "groupable": true,
+            "hidden": false,
+            "type": "date"
+        },
+        {
+            "field": "dueDate",
+            "title": "Due date",
+            "width": 200,
+            "sortable": true,
+            "filterable": true,
+            "groupable": true,
+            "hidden": false,
+            "type": "date"
+        },
+        {
+            "field": "state",
+            "title": "Actions",
+            "width": 200,
+            "sortable": true,
+            "filterable": true,
+            "groupable": false,
+            "hidden": false,
+            "template": true
+        }
+    ]
 }

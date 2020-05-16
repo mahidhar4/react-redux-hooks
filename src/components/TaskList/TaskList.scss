@@ -126,3 +126,14 @@ table {
     border-top: 5px solid #f8f6ff;
   }
 }
+.grouping-headers{
+    text-align: left;
+    td {
+        padding-left: 15px;
+    }
+}
+.content-box{
+    tbody tr {
+        min-height: 30px;
+    }
+}
