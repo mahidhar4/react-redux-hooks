@@ -22,7 +22,7 @@ const filterAndAttachRow = (header, innerItem, search) => {
         if (start > -1) {
             strData = <>
                 <span>{strData.substr(0, start)}</span>
-                <span className="higlight">{strData.substr(start, end)}</span>
+                <span className="higlight">{strData.substr(start, middle)}</span>
                 <span>{strData.substr(end)}</span>
             </>;
         }
