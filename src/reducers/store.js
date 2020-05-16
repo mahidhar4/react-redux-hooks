@@ -14,7 +14,8 @@ const createStoreFn = initialState =>
             },
             config: {
                 configData
-            }
+            },
+            ...initialState
         },
         composeEnhancers(applyMiddleware(thunk))
     );

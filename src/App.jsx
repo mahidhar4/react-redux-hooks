@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Home from './components/Home/Home';
 import './App.css';
 import {
@@ -6,10 +6,18 @@ import {
   Switch,
   Route
 } from "react-router-dom";
+import { connect } from "react-redux";
+import Spinner from 'react-bootstrap/Spinner'
 
-function App() {
+function App(props) {
+
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  useEffect(() => {
+    setShowSpinner(props.isFetching);
+  }, [props.isFetching]);
+
   return (
-
     <Router>
       <div>
         <Switch>
@@ -17,9 +25,21 @@ function App() {
             <Home />
           </Route>
         </Switch>
+        {
+          showSpinner && (
+            <div className='custom-modal-overlay'>
+              <Spinner animation="grow" variant="primary" />
+            </div>
+          )
+        }
       </div>
     </Router>
   );
-}
+};
 
-export default App;
+
+const mapStateToProps = (state) => ({
+  isFetching: state.shared.isFetching
+});
+
+export default connect(mapStateToProps, null)(App);
