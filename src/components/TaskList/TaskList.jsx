@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { enumState, applySearchSortGroupOnData, EntryWindowMode, sortData } from "../../utils/constants";
+import React, { useEffect, useReducer } from "react";
+import { enumState, applySearchSortGroupOnData, EntryWindowMode, hasValue } from "../../utils/constants";
 import "./TaskList.scss";
 import { connect } from "react-redux";
 import { actions as taskActions } from "../../reducers/actions/tasks";
@@ -16,27 +16,47 @@ const enumClick = {
   View: "View"
 };
 
-const TaskList = (props) => {
+function reducer(state, action) {
+  if (hasValue(action.type)) {
+    return { ...state, [action.type]: action.payload };
+  }
+  else {
+    throw new Error();
+  }
+};
 
-
-  const [groupBy, setGroupBy] = useState("");
-  const [data, setData] = useState({});
-  const [showEdit, setShowEdit] = useState(false);
-  const [showView, setShowView] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [status, setStatus] = useState("");
-  const [searchVal, setSearchVal] = useState("");
-  const [sort, setSort] = useState({
+const initialState = {
+  selectedGroupBy: "",
+  selectedStatus: "",
+  selectedSort: {
     column: null,
     direction: "desc",
-  });
+  },
+  searchVal: "",
+  data: {},
+  showEdit: false,
+  showView: false,
+  selectedItem: null
+};
+
+const TaskList = ({ getListOfTasks, ...props }) => {
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const viewEditTask = (val) => {
+    dispatch({ type: 'showEdit', payload: val });
+  };
+
+  const viewTaskDetails = (val) => {
+    dispatch({ type: 'showView', payload: val });
+  };
 
   useEffect(() => {
-    props.getListOfTasks();
-  }, []);
+    getListOfTasks();
+  }, [getListOfTasks]);
 
   useEffect(() => {
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, groupBy, sort, status));
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   }, [props.tasksList]);
 
 
@@ -46,14 +66,15 @@ const TaskList = (props) => {
 
     let sortDetails = {
       column,
-      direction: sort.column
-        ? sort.direction === "asc"
+      direction: state.selectedSort.column
+        ? state.selectedSort.direction === "asc"
           ? "desc"
           : "asc"
         : "desc"
     }
-    setSort(sortDetails);
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, groupBy, sortDetails, status));
+
+    dispatch({ type: 'selectedSort', payload: sortDetails });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, sortDetails, state.selectedStatus) });
   };
 
   const setArrow = (column) => {
@@ -62,16 +83,16 @@ const TaskList = (props) => {
 
     let className = "sort-direction";
 
-    if (sort.column === column) {
-      className += sort.direction === "asc" ? " asc" : " desc";
+    if (state.selectedSort.column === column) {
+      className += state.selectedSort.direction === "asc" ? " asc" : " desc";
     }
 
     return className;
   };
 
   const onGroupSelect = (event) => {
-    setGroupBy(event.target.value);
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, event.target.value, sort, status));
+    dispatch({ type: 'selectedGroupBy', payload: event.target.value });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, event.target.value, state.selectedSort, state.selectedStatus) });
   };
 
   const handleClick = (event, item, clickType) => {
@@ -79,12 +100,12 @@ const TaskList = (props) => {
     event.stopPropagation();
     switch (clickType) {
       case enumClick.Edit:
-        setShowEdit(true);
-        setSelectedItem(item);
+        viewEditTask(true);
+        dispatch({ type: 'selectedItem', payload: item });
         break;
       case enumClick.View:
-        setShowView(true);
-        setSelectedItem(item);
+        viewTaskDetails(true);
+        dispatch({ type: 'selectedItem', payload: item });
         break;
       case enumClick.Delete:
         props.deleteTask(item);
@@ -107,13 +128,13 @@ const TaskList = (props) => {
   };
 
   const onSearchChange = (event) => {
-    setSearchVal(event.target.value);
-    setData(applySearchSortGroupOnData(props.tasksList, event.target.value, props.configData.AllowGlobalSearchProps, groupBy, sort, status));
+    dispatch({ type: 'searchVal', payload: event.target.value });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, event.target.value, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   };
 
   const onSetStatusChange = (selectedStatus) => {
-    setStatus(selectedStatus);
-    setData(applySearchSortGroupOnData(props.tasksList, searchVal, props.configData.AllowGlobalSearchProps, groupBy, sort, selectedStatus));
+    dispatch({ type: 'selectedStatus', payload: selectedStatus });
+    dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, selectedStatus) });
   };
 
   return (
@@ -139,25 +160,25 @@ const TaskList = (props) => {
       </div>
 
       <div className="tabs">
-        <Button variant={status === "" ? "primary" : "light"} onClick={() => onSetStatusChange("")}>All</Button>{' '}
-        <Button variant={status === enumState.Open ? "primary" : "light"} onClick={() => onSetStatusChange(enumState.Open)}>Pending</Button>{' '}
-        <Button variant={status === enumState.Done ? "primary" : "light"} onClick={() => onSetStatusChange(enumState.Done)}>Completed</Button>
+        <Button variant={state.selectedStatus === "" ? "primary" : "light"} onClick={() => onSetStatusChange("")}>All</Button>{' '}
+        <Button variant={state.selectedStatus === enumState.Open ? "primary" : "light"} onClick={() => onSetStatusChange(enumState.Open)}>Pending</Button>{' '}
+        <Button variant={state.selectedStatus === enumState.Done ? "primary" : "light"} onClick={() => onSetStatusChange(enumState.Done)}>Completed</Button>
       </div>
 
       <div className="content-box">
         <ListGrid
-          tasksList={data}
+          tasksList={state.data}
           onSort={onSort}
           setArrow={setArrow}
-          groupBy={groupBy}
+          groupBy={state.selectedGroupBy}
           handleClick={handleClick}
         />
       </div>
-      <ModalPopup showModal={showEdit} onClose={() => setShowEdit(false)}>
-        <Task mode={EntryWindowMode.Edit} taskItem={selectedItem} onClose={setShowEdit} />
+      <ModalPopup showModal={state.showEdit} onClose={() => viewEditTask(false)}>
+        <Task mode={EntryWindowMode.Edit} taskItem={state.selectedItem} onClose={viewEditTask} />
       </ModalPopup>
-      <ModalPopup showModal={showView} onClose={() => setShowView(false)}>
-        <Task mode={EntryWindowMode.View} taskItem={selectedItem} onClose={setShowView} />
+      <ModalPopup showModal={state.showView} onClose={() => viewTaskDetails(false)}>
+        <Task mode={EntryWindowMode.View} taskItem={state.selectedItem} onClose={viewTaskDetails} />
       </ModalPopup>
     </>
   );
