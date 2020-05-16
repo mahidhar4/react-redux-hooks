@@ -4,16 +4,16 @@ import "./TaskList.scss";
 import { connect } from "react-redux";
 import { actions as taskActions } from "../../reducers/actions/tasks";
 import { Button } from "react-bootstrap";
-import ModalPopup from '../Modal/ModalPopup';
-import Task from '../Tasks/Task';
-import Form from 'react-bootstrap/Form'
+import ModalPopup from "../Modal/ModalPopup";
+import Task from "../Tasks/Task";
+import Form from "react-bootstrap/Form";
 
 const enumClick = {
   Edit: "Edit",
   Delete: "Delete",
   Done: "Done",
   ReOpen: "ReOpen",
-  View: "View"
+  View: "View",
 };
 
 function reducer(state, action) {
@@ -59,9 +59,7 @@ const TaskList = ({ getListOfTasks, ...props }) => {
     dispatch({ type: 'data', payload: applySearchSortGroupOnData(props.tasksList, state.searchVal, props.configData.AllowGlobalSearchProps, state.selectedGroupBy, state.selectedSort, state.selectedStatus) });
   }, [props.tasksList]);
 
-
   const onSort = (column) => {
-
     if (props.configData.AllowSortProps.indexOf(column) <= -1) return;
 
     let sortDetails = {
@@ -78,7 +76,6 @@ const TaskList = ({ getListOfTasks, ...props }) => {
   };
 
   const setArrow = (column) => {
-
     if (props.configData.AllowSortProps.indexOf(column) <= -1) return;
 
     let className = "sort-direction";
@@ -113,13 +110,13 @@ const TaskList = ({ getListOfTasks, ...props }) => {
       case enumClick.Done:
         props.updateTask({
           ...item,
-          state: enumState.Done
+          state: enumState.Done,
         });
         break;
       case enumClick.ReOpen:
         props.updateTask({
           ...item,
-          state: enumState.Open
+          state: enumState.Open,
         });
         break;
       default:
@@ -139,26 +136,32 @@ const TaskList = ({ getListOfTasks, ...props }) => {
 
   return (
     <>
-      <div className="global-fields">
-        <Form.Group className="search-section" controlId="search">
-          <Form.Label>Global Search</Form.Label>
-          <Form.Control type="text" placeholder="Search" onChange={(e) => onSearchChange(e)} />
-        </Form.Group>
+      <div className="main-section">
+        <div className="global-fields">
+          <Form.Group className="search-section" controlId="search">
+            <Form.Label>Global Search</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Search"
+              onChange={(e) => onSearchChange(e)}
+            />
+          </Form.Group>
 
-
-        <Form.Group className="grouping-section" controlId="group-by">
-          <Form.Label className="groupby-text">Group By</Form.Label>
-          <Form.Control as="select" className="groupby-dropdown" onChange={(e) => onGroupSelect(e)}>
-            <option value="">None</option>
-            {
-              props.configData.AllowGroupByProps.map(groupProp => (
+          <Form.Group className="grouping-section" controlId="group-by">
+            <Form.Label className="groupby-text">Group By</Form.Label>
+            <Form.Control
+              as="select"
+              className="groupby-dropdown"
+              onChange={(e) => onGroupSelect(e)}
+            >
+              <option value="">None</option>
+              {props.configData.AllowGroupByProps.map((groupProp) => (
                 <option value={groupProp}>{groupProp}</option>
-              ))
-            }
-          </Form.Control>
-        </Form.Group>
+              ))}
+            </Form.Control>
+          </Form.Group>
+        </div>
       </div>
-
       <div className="tabs">
         <Button variant={state.selectedStatus === "" ? "primary" : "light"} onClick={() => onSetStatusChange("")}>All</Button>{' '}
         <Button variant={state.selectedStatus === enumState.Open ? "primary" : "light"} onClick={() => onSetStatusChange(enumState.Open)}>Pending</Button>{' '}
@@ -221,7 +224,7 @@ const ListGrid = (props) => {
                     <tr className="grouping-headers">
                       <td>
                         {props.groupBy === "createdAt" ||
-                          props.groupBy === "dueDate"
+                        props.groupBy === "dueDate"
                           ? new Date(item).toLocaleDateString()
                           : item}
                       </td>
@@ -232,7 +235,18 @@ const ListGrid = (props) => {
                     </tr>
                   )}
 
-                  <tr className={innerItem.state === enumState.Done ? "strikeout" : ""} onClick={(event) => props.handleClick(event, innerItem, enumClick.View)}>
+                  <tr
+                    className={
+                      innerItem.state === enumState.Done
+                        ? "done"
+                        : innerItem.state === enumState.Open
+                        ? "pending"
+                        : ""
+                    }
+                    onClick={(event) =>
+                      props.handleClick(event, innerItem, enumClick.View)
+                    }
+                  >
                     <td>{innerItem.taskSummary}</td>
                     <td>{innerItem.priority}</td>
                     <td>
@@ -242,21 +256,61 @@ const ListGrid = (props) => {
                     <td>
                       {innerItem.state === enumState.Open ? (
                         <>
-                          <Button size="sm" variant="secondary" onClick={(event) => props.handleClick(event, innerItem, enumClick.Edit)}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={(event) =>
+                              props.handleClick(
+                                event,
+                                innerItem,
+                                enumClick.Edit
+                              )
+                            }
+                          >
                             Edit
                           </Button>{" "}
-                          <Button size="sm" variant="danger" onClick={(event) => props.handleClick(event, innerItem, enumClick.Delete)}>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={(event) =>
+                              props.handleClick(
+                                event,
+                                innerItem,
+                                enumClick.Delete
+                              )
+                            }
+                          >
                             Delete
                           </Button>{" "}
-                          <Button size="sm" variant="primary" onClick={(event) => props.handleClick(event, innerItem, enumClick.Done)}>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={(event) =>
+                              props.handleClick(
+                                event,
+                                innerItem,
+                                enumClick.Done
+                              )
+                            }
+                          >
                             Done
                           </Button>
                         </>
                       ) : (
-                          <Button size="sm" variant="primary" onClick={(event) => props.handleClick(event, innerItem, enumClick.ReOpen)}>
-                            Re open
-                          </Button>
-                        )}
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={(event) =>
+                            props.handleClick(
+                              event,
+                              innerItem,
+                              enumClick.ReOpen
+                            )
+                          }
+                        >
+                          Re open
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 </>
@@ -275,7 +329,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) => ({
   tasksList: state.tasks.tasksList,
-  configData: state.config.configData
+  configData: state.config.configData,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TaskList);

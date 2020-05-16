@@ -133,6 +133,7 @@ const Task = (props) => {
 
                     </Form.Row>
                 </fieldset>
+                <div className="modal-button-section">
                 {
                     (props.mode !== EntryWindowMode.View) && (
                         <Button variant="primary" type="submit" className="btn-save">
@@ -143,6 +144,7 @@ const Task = (props) => {
                 <Button variant="secondary" onClick={() => props.onClose(false)}>
                     {props.mode === EntryWindowMode.View ? "Close" : "Cancel"}
                 </Button>
+                </div>
             </Form>
         </>
     );
