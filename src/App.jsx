@@ -24,7 +24,7 @@ function App(props) {
           <Route path="/">
             <div className="header">
               <a href="/" className="logo">
-                <h3>To Do</h3>
+                <h3 onClick={sentryTesting}>To Do</h3>
               </a>
             </div>
             <Home />
