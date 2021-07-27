@@ -12,6 +12,9 @@ import Spinner from 'react-bootstrap/Spinner'
 function App(props) {
 
   const [showSpinner, setShowSpinner] = useState(false);
+  const sentryTesting = () => {
+    throw new Error("Sentry Log Runtime error Verification");
+  }
 
   useEffect(() => {
     setShowSpinner(props.isFetching);
